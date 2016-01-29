@@ -30,33 +30,38 @@ public class DCLab1Client
         DataInputStream inputFromServer;
         DataOutputStream outputToServer;
 
-        try {
-            // create a socket to connect to the server
-            Socket socket = new Socket(server, port);
-
+        try (Socket socket = new Socket(server, port)){
             // create data input/output streams
-            inputFromServer = new DataInputStream(socket.getInputStream());
-            outputToServer = new DataOutputStream(socket.getOutputStream());
+            //inputFromServer = new DataInputStream(socket.getInputStream());
+            //outputToServer = new DataOutputStream(socket.getOutputStream());
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//            OutputStream out = new BufferedOutputStream(socket.getOutputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            PrintStream pout = new PrintStream(out);
 
             // create Scanner object to read radius from the keyboard
             Scanner sc = new Scanner(System.in);
-            System.out.print("Enter radius = ");
-            while (sc.hasNextDouble()) {
-                // get a radius
-                double radius = sc.nextDouble();
+            System.out.print(">");
 
+            while (sc.hasNext()) {
+                // get command
+                String cmd = sc.nextLine();
+                
                 // send radius to sever
-                outputToServer.writeDouble(radius);
-                outputToServer.flush();
+                System.out.println("sending command " + cmd);
+                pout.println(cmd);
+                pout.flush();
+                out.flush();
 
                 // get area from server
-                //double area = inputFromServer.readDouble();
-                String s = inputFromServer.readUTF();
-                System.out.print("server msg is " + s);
+                //String res = in.readLine();
+                //System.out.print("server msg is " + res);
             }
-            inputFromServer.close();
-            outputToServer.close();
+            pout.close();
+            in.close();
+            out.close();
             socket.close();
+            System.out.println("Client closed");
         } catch (IOException e) {
             System.err.println(e);
         }
