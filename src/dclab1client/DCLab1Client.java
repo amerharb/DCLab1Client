@@ -52,7 +52,6 @@ public class DCLab1Client
                 // get area from server
                 //double area = inputFromServer.readDouble();
                 String s = inputFromServer.readUTF();
-
                 System.out.print("server msg is " + s);
             }
             inputFromServer.close();
