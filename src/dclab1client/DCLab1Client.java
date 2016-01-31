@@ -33,7 +33,9 @@ public class DCLab1Client
         try {
             // create data input/output streams
             Socket socket = new Socket(server, port);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            InputStream is = socket.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+            BufferedReader in = new BufferedReader(isr);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             PrintStream pout = new PrintStream(out);
 
@@ -49,23 +51,41 @@ public class DCLab1Client
                     break;
                 }
                 // send radius to sever
-                System.out.println("sending command " + cmd);
                 pout.println(cmd);
                 pout.flush();
                 out.flush();
+                String res;
+                if (cmd.startsWith("get ")) {
+                    res = in.readLine();
+                    System.out.println(res);
+                    if (res.equals("COPYING")) {
+                        File f = new File("." + File.separator + cmd.substring(4) + "01");
+                        
+                        FileOutputStream fos = new FileOutputStream(f);
+                        DataInputStream dis = new DataInputStream(is);
 
-                System.out.println("before ready");
-                int count = 0;
-                while (!in.ready() && count < 3) { //Wait Server Answer 5 second
-                    Thread.sleep(500);
-                    count++;
-                }
-                System.out.println("after ready count is = " + count);
-                if (count >= 3) {
-                    System.out.println("Time run out");
+                        int fileSize = dis.readInt();
+                        byte[] fileData;
+                        fileData = new byte[fileSize];
+                        is.read(fileData, 0, fileSize);
+                        fos.write(fileData, 0, fileSize);
+                    } else {
+                        Thread.sleep(100);
+                        while (in.ready()) {
+                            res = in.readLine();
+                            Thread.sleep(100);
+                            System.out.println(res);
+                        }
+                    }
                 } else {
-                    String res = in.readLine();
-                    System.out.println("server msg is " + res);
+                    res = in.readLine();
+                    System.out.println(res);
+                    Thread.sleep(100);
+                    while (in.ready()) {
+                        res = in.readLine();
+                        Thread.sleep(100);
+                        System.out.println(res);
+                    }
                 }
             }
 
@@ -74,7 +94,6 @@ public class DCLab1Client
             in.close();
             out.close();
             socket.close();
-            Thread.sleep(5000);
             System.out.println("Client closed");
 
         } catch (IOException e) {
