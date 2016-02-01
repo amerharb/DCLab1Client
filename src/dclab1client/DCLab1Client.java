@@ -59,34 +59,55 @@ public class DCLab1Client
                     res = in.readLine();
                     System.out.println(res);
                     if (res.equals("COPYING")) {
-                        File f = new File("." + File.separator + cmd.substring(4) + "01");
-                        
+                        File f = new File("." + File.separator + cmd.substring(4) + ".bak");
+
                         FileOutputStream fos = new FileOutputStream(f);
                         DataInputStream dis = new DataInputStream(is);
 
-                        int fileSize = dis.readInt();
-                        byte[] fileData;
-                        fileData = new byte[fileSize];
-                        is.read(fileData, 0, fileSize);
-                        fos.write(fileData, 0, fileSize);
+                        int fileSize = 0;
+                        byte b;
+                        byte[] stack = new byte[1024];
+
+                        while (dis.available() > 0) {
+                            b = dis.readByte();
+                            stack[fileSize] = b;
+                            fileSize++;
+                            if (fileSize == stack.length) {//expand stack
+                                byte[] temp = new byte[stack.length * 2];
+                                System.arraycopy(stack, 0, temp, 0, fileSize);
+                                stack = new byte[stack.length * 2];
+                                System.arraycopy(temp, 0, stack, 0, fileSize);
+                                temp = null;
+                            }
+                        }
+
+                        byte[] fileData = new byte[fileSize];
+                        System.arraycopy(stack, 0, fileData, 0, fileSize);
+                        stack = null;
+                        //fileData = new byte[fileSize];
+                        //is.read(fileData, 0, fileSize);
+                        fos.write(fileData);
+                        //TODO close the file, there a proplem that it might close the socket
+                        
                     } else {
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                         while (in.ready()) {
                             res = in.readLine();
-                            Thread.sleep(100);
+                            Thread.sleep(50);
                             System.out.println(res);
                         }
                     }
                 } else {
                     res = in.readLine();
                     System.out.println(res);
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                     while (in.ready()) {
                         res = in.readLine();
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                         System.out.println(res);
                     }
                 }
+
             }
 
             System.out.println("Client is closing");
@@ -99,7 +120,5 @@ public class DCLab1Client
         } catch (IOException e) {
             System.err.println(e);
         }
-
     }
-
 }
