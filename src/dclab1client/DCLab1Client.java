@@ -100,27 +100,6 @@ public class DCLab1Client
 
                     String cmd;
                     long lastRespons = System.currentTimeMillis(); // it start count from the moment we are waiting command
-//                    while (!R.hasCommand) { 
-//                        //STOP BR if (connected && br.ready()) {
-//                        if (connected) {
-//                            //STOP BR String r = br.readLine();
-//                            String r = dis.readLine();
-//                            lastRespons = System.currentTimeMillis();
-////                            if (r.equals("PING")) {
-////                                ps.println("AKG");
-////                                ps.flush();
-////                            } else { //server has something else but i am not waiting anythign so its better to empty the buffer
-////
-////                            }
-//                        }
-//                        if (connected && System.currentTimeMillis() - lastRespons > 600000) { //600 sec no ping
-//                            System.out.println("No reponse from Server for more than 600 sec");
-//
-//                            reconnect = true;
-//                            break COMMANDS;
-//                        }
-//                        Thread.sleep(10);
-//                    }
                     while (!R.hasCommand) {
                         Thread.sleep(100);
                     }
@@ -131,17 +110,6 @@ public class DCLab1Client
                     if (cmd.trim().isEmpty()) { //read from server if there is any msg
                         if (connected) {
 
-//                            if (!br.ready()) {
-//                                Thread.sleep(50);
-//                            }
-//                            while (br.ready()) {
-//                                res = br.readLine();
-//                                lastRespons = System.currentTimeMillis();
-//                                if (!br.ready()) {
-//                                    Thread.sleep(500);
-//                                }
-//                                System.out.println(res);
-//                            }
                             do {
                                 res = dis.readLine();
                                 lastRespons = System.currentTimeMillis();
@@ -179,15 +147,8 @@ public class DCLab1Client
                         GET:
                         if (cmd.startsWith("get ")) {
 
-//                            res = br.readLine();
                             res = dis.readLine();
                             lastRespons = System.currentTimeMillis();
-//                            if (br.ready()) {
-//                                res = br.readLine();
-//                                lastRespons = System.currentTimeMillis();
-//                            } else {
-//                                break GET;
-//                            }
                             System.out.println(res);
                             COPYING:
                             if (res.startsWith("COPYING ")) {
@@ -204,21 +165,8 @@ public class DCLab1Client
                                 File f = new File(newFileName);
 
                                 FileOutputStream fos = new FileOutputStream(f);
-//                                DataInputStream dis = new DataInputStream(is);
 
-//                        Option 2 to write its faster than old way
-                                //wait for server to get ready
                                 long timeOut = System.currentTimeMillis();
-//                                while (dis.available() < 1) {
-//                                    Thread.sleep(100);
-//                                    if ((System.currentTimeMillis() - timeOut) > 10000) {//wait for 10 sec
-//                                        System.out.println("time out no file comes from server");
-//                                        break COPYING;
-//                                    }
-//                                }
-
-//                                System.out.println("available: " + dis.available());
-//                                System.out.println(br.ready());
 
                                 byte[] b;
                                 final int defBufferSize = 8192;
@@ -244,82 +192,20 @@ public class DCLab1Client
                                 fos.close();
                                 b = null;
 
-//                      old way to write file does not work with big file
-//                        int fileSize = 0;
-//                        byte b;
-//                        byte[] stack = new byte[1024];
-//
-//                        while (dis.available() > 0) {
-//                            b = dis.readByte();
-//                            stack[fileSize] = b;
-//                            fileSize++;
-//                            if (fileSize == stack.length) {//expand stack
-//                                byte[] temp = new byte[stack.length * 2];
-//                                System.arraycopy(stack, 0, temp, 0, fileSize);
-//                                stack = new byte[stack.length * 2];
-//                                System.arraycopy(temp, 0, stack, 0, fileSize);
-//                                temp = null;
-//                            }
-//                        }
-//
-//                        byte[] fileData = new byte[fileSize];
-//                        System.arraycopy(stack, 0, fileData, 0, fileSize);
-//                        stack = null;
-//                        //fileData = new byte[fileSize];
-//                        //is.read(fileData, 0, fileSize);
-//                        fos.write(fileData);
                             } else { // if the response is not equal COPYING then there must a String reply
                                 do {
                                     res = dis.readLine();
                                     lastRespons = System.currentTimeMillis();
                                     System.out.println(res);
                                 } while (!res.isEmpty());
-//                                while (!br.ready()) {
-//                                    Thread.sleep(500);
-//                                }
-//                                while (br.ready()) {
-//                                    res = br.readLine();
-//                                    lastRespons = System.currentTimeMillis();
-//                                    if (!br.ready()) {
-//                                        Thread.sleep(50);
-//                                    }
-//                                    if (res.equals("PING")) { //ignore ping signal
-//                                        ps.println("AKG");
-//                                        ps.flush();
-//                                    } else {
-//                                        System.out.println(res);
-//                                    }
-//                                    if (!br.ready()) {
-//                                        Thread.sleep(100);
-//                                    }
-//                                }
                             } 
                         } else { //if not get
 
-//                            while (!br.ready()) {
-//                                Thread.sleep(50);
-//                            }
                             do {
                                 res = dis.readLine();
                                 lastRespons = System.currentTimeMillis();
                                 System.out.println(res);
                             } while (!res.isEmpty());
-//                            while (br.ready()) {
-//                                res = br.readLine();
-//                                lastRespons = System.currentTimeMillis();
-//                                if (!br.ready()) {
-//                                    Thread.sleep(50);
-//                                }
-//                                if (res.equals("PING")) { //ignore ping signal
-//                                    ps.println("AKG");
-//                                    ps.flush();
-//                                } else {
-//                                    System.out.println(res);
-//                                }
-//                                if (!br.ready()) {
-//                                    Thread.sleep(100);
-//                                }
-//                            }
                         }
                     } else { //not internal command and its not connacted
                         System.out.println("command not sent, you are not connacted!!");
@@ -330,7 +216,6 @@ public class DCLab1Client
                 System.out.println("Client is closing");
                 if (connected) {
                     ps.close();
-//                    br.close();
                     dis.close();
                     out.close();
                     socket.close();
